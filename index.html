@@ -2,15 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Canvas - Sans images</title>
+  <meta charset="UTF-8" />
+  <title>Space Invaders</title>
   <style>
     body {
       background: black;
       color: white;
-      text-align: center;
       margin: 0;
       font-family: sans-serif;
+      text-align: center;
     }
     canvas {
       display: block;
@@ -21,12 +21,17 @@
   </style>
 </head>
 <body>
-  <h1>🎯 Test Canvas - Sans images</h1>
+  <h1>🚀 Space Invaders</h1>
   <canvas id="gameCanvas" width="600" height="600"></canvas>
   <script>
     window.onload = function () {
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
+
+      const playerImg = new Image();
+      const alienImg = new Image();
+      playerImg.src = "player.png";
+      alienImg.src = "alien.png";
 
       const player = { x: 275, y: 530, width: 50, height: 50, speed: 5 };
       const aliens = [];
@@ -36,11 +41,10 @@
 
       function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "lime";
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-
-        ctx.fillStyle = "red";
-        aliens.forEach(a => ctx.fillRect(a.x, a.y, a.width, a.height));
+        if (playerImg.complete) ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+        if (alienImg.complete) {
+          aliens.forEach(a => ctx.drawImage(alienImg, a.x, a.y, a.width, a.height));
+        }
       }
 
       function gameLoop() {
@@ -48,7 +52,12 @@
         requestAnimationFrame(gameLoop);
       }
 
-      gameLoop();
+      Promise.all([
+        new Promise(res => playerImg.onload = res),
+        new Promise(res => alienImg.onload = res)
+      ]).then(() => {
+        gameLoop();
+      });
     };
   </script>
 </body>
